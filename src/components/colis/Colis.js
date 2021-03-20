@@ -1,29 +1,98 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import {deleteColis, getColis, postColis, putColis} from "../../actions";
-import {connect} from 'react-redux';
+import Button from "@material-ui/core/Button";
+import React, {useEffect} from "react";
+import TextField from '@material-ui/core/TextField';
+import {useForm, Controller} from "react-hook-form";
+import Grid from '@material-ui/core/Grid';
+
+import {getColis, postColis, putColis, deleteColis} from '../../actions/index';
+import {connect} from "react-redux";
 
 
-class Colis extends React.Component {
+const Colis = (props) => {
 
-    componentDidMount() {
-        this.props.getColis();
-    }
+    useEffect(() => {
+        props.getColis();
+    }, [])
 
-    render() {
-        return (
+    const {control, handleSubmit} = useForm();
+
+    return (
+        <>
             <ul>
                 {
-                    this.props.colis.map(colis => {
+                    props.colis.map((colis, index) => {
                         return (
-                            <li key={colis.id}>{`Destination: ${colis.destination}, Sender: ${colis.sender}, Receiver: ${colis.receiver}`}</li>
+                            <li key={index}>{`Destination: ${colis.destination}, Sender: ${colis.sender}, Receiver: ${colis.receiver}`}</li>
                         )
                     })
                 }
             </ul>
-        );
-    }
+            <form onSubmit={handleSubmit(props.postColis)}>
+                <Grid container>
+                    <Grid item xs={12}>
+                        <Controller
+                            rules={{required: true}}
+                            name="destination"
+                            control={control}
+                            defaultValue={""}
+                            render={({onChange, value, name, ref}, {invalid}) => {
+                                return (
+                                    <TextField error={invalid}
+                                               required
+                                               inputRef={ref} fullWidth onChange={onChange}
+                                               value={value}
+                                               id={name} label="Colis destination" multiline rowsMax={4}/>
+                                );
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Controller
+                            rules={{required: true}}
+                            name="receiver"
+                            control={control}
+                            defaultValue={""}
+                            render={({onChange, value, name, ref}, {invalid}) => {
+                                return (
+                                    <TextField error={invalid}
+                                               required inputRef={ref} fullWidth onChange={onChange} value={value}
+                                               id={name}
+                                               label="Receiver"/>
+                                );
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Controller
+                            rules={{required: true}}
+                            name="sender"
+                            control={control}
+                            defaultValue={""}
+                            render={({onChange, value, name, ref}, {invalid}) => {
+                                return (
+                                    <TextField error={invalid}
+                                               required inputRef={ref} fullWidth onChange={onChange} value={value}
+                                               id={name}
+                                               label="Sender"/>
+                                );
+                            }}
+                        />
+                    </Grid>
+                    <Grid container>
+                        <Grid item xs={12}>
+                            <Button type="submit" color="primary" autoFocus>
+                                {"Submit"}
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </form>
+        </>
+    );
 }
+
+Colis.propTypes = {
+};
 
 const mapStateToProps = (state) => {
     return {
